@@ -27,7 +27,7 @@ pub fn main() !void {
         const line = io.readLine();
 
         for (line, 0..) |char, index| {
-            if (isDigit(char)) {
+            if (IO.isDigit(char)) {
                 if (first_digit_index == null)
                     first_digit_index = index;
             } else {
@@ -56,7 +56,7 @@ pub fn main() !void {
                 }
             }
 
-            const is_symbol = !isDigit(char) and char != '.';
+            const is_symbol = !IO.isDigit(char) and char != '.';
             symbol_buffer[index] = is_symbol;
 
             if (is_symbol) {
@@ -93,16 +93,12 @@ pub fn main() !void {
 
 fn maybeSaveNumber(line: []const u8, next_slice: []u16, index: usize, first_digit_index: ?usize) void {
     if (first_digit_index) |fdi| {
-        const number = IO.asInt(u16, line[fdi..index]);
+        const number = IO.asInt(u16, line[fdi..index]).?;
 
         var slice_index = fdi;
         while (slice_index < index) : (slice_index += 1)
             next_slice[slice_index] = number;
     }
-}
-
-fn isDigit(char: u8) bool {
-    return char >= '0' and char <= '9';
 }
 
 fn cleanBackward(slice: []u16, index: usize) void {

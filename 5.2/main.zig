@@ -23,29 +23,28 @@ pub fn main() !void {
 
     _ = io.readWord();
     while (!io.eof()) {
-        const maybe_number = io.readWord();
-        if (maybe_number.len == 0) {
+        if (io.readInt(Number)) |start| {
+            const range_length = io.readInt(Number).?;
+            try ranges.append(.{ .start = start, .length = range_length });
+        } else {
             _ = io.readLine();
             break;
         }
-        const start = IO.asInt(Number, maybe_number);
-        const range_length = io.readInt(Number);
-        try ranges.append(.{ .start = start, .length = range_length });
     }
 
     while (!io.eof()) {
         var next_ranges = ArrayList(Range).init(allocator);
 
         while (!io.eof()) {
-            const maybe_destination = io.readWord();
-            if (maybe_destination.len == 0) {
+            const maybe_destination = io.readInt(Number);
+            if (maybe_destination == null) {
                 _ = io.readLine();
                 break;
             }
 
-            const destination = IO.asInt(Number, maybe_destination);
-            const source = io.readInt(Number);
-            const range_length = io.readInt(Number);
+            const destination = maybe_destination.?;
+            const source = io.readInt(Number).?;
+            const range_length = io.readInt(Number).?;
 
             var index: usize = 0;
             while (index < ranges.items.len) {

@@ -20,12 +20,12 @@ pub fn main() !void {
 
     _ = io.readWord();
     while (!io.eof()) : (length += 1) {
-        const maybe_number = io.readWord();
-        if (maybe_number.len == 0) {
+        if (io.readInt(Number)) |number|
+            next_numbers_buf[length] = number
+        else {
             _ = io.readLine();
             break;
         }
-        next_numbers_buf[length] = IO.asInt(Number, maybe_number);
     }
 
     var numbers = numbers_buf[0..length];
@@ -39,15 +39,15 @@ pub fn main() !void {
         @memset(touched[0..length], false);
 
         while (!io.eof()) {
-            const maybe_destination = io.readWord();
-            if (maybe_destination.len == 0) {
+            const maybe_destination = io.readInt(Number);
+            if (maybe_destination == null) {
                 _ = io.readLine();
                 break;
             }
 
-            const destination = IO.asInt(Number, maybe_destination);
-            const source = io.readInt(Number);
-            const range_length = io.readInt(Number);
+            const destination = maybe_destination.?;
+            const source = io.readInt(Number).?;
+            const range_length = io.readInt(Number).?;
 
             for (numbers, 0..) |number, index|
                 if (!touched[index] and number >= source and number < source + range_length) {

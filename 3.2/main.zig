@@ -32,7 +32,7 @@ pub fn main() !void {
         last_line_len = line.len;
 
         for (line, 0..) |char, index| {
-            if (isDigit(char)) {
+            if (IO.isDigit(char)) {
                 if (first_digit_index == null)
                     first_digit_index = index;
             } else {
@@ -122,14 +122,10 @@ fn processLine(
 
 fn maybeSaveNumber(line: []const u8, next_slice: []u16, index: usize, first_digit_index: ?usize) void {
     if (first_digit_index) |fdi| {
-        const number = IO.asInt(u16, line[fdi..index]);
+        const number = IO.asInt(u16, line[fdi..index]).?;
 
         var slice_index = fdi;
         while (slice_index < index) : (slice_index += 1)
             next_slice[slice_index] = number;
     }
-}
-
-fn isDigit(char: u8) bool {
-    return char >= '0' and char <= '9';
 }

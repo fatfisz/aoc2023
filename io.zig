@@ -4,6 +4,7 @@ const File = @import("std").fs.File;
 const Allocator = @import("std").mem.Allocator;
 const endsWith = @import("std").mem.endsWith;
 const indexOfAnyPos = @import("std").mem.indexOfAnyPos;
+const indexOfNonePos = @import("std").mem.indexOfNonePos;
 const indexOfScalarPos = @import("std").mem.indexOfScalarPos;
 const trim = @import("std").mem.trim;
 const argsWithAllocator = @import("std").process.argsWithAllocator;
@@ -41,24 +42,7 @@ pub const IO = struct {
         return self.input_index == self.trimmed_input.len;
     }
 
-    pub fn skip(self: *IO) void {
-        // Check this before calling the method
-        if (self.eof()) unreachable;
-        self.input_index += 1;
-    }
-
-    pub fn peek(self: *IO) u8 {
-        // Check this before calling the method
-        if (self.eof()) unreachable;
-        return self.trimmed_input[self.input_index];
-    }
-
-    pub fn next(self: *IO) u8 {
-        defer self.skip();
-        return self.peek();
-    }
-
-    pub fn readUntil(self: *IO, value: u8) []const u8 {
+    fn readUntil(self: *IO, value: u8) []const u8 {
         // Check this before calling the method
         if (self.eof()) unreachable;
 
@@ -70,7 +54,7 @@ pub const IO = struct {
         return self.trimmed_input[self.input_index..pos];
     }
 
-    pub fn readUntilAny(self: *IO, values: []const u8) []const u8 {
+    fn readUntilAny(self: *IO, values: []const u8) []const u8 {
         // Check this before calling the method
         if (self.eof()) unreachable;
 
@@ -82,18 +66,19 @@ pub const IO = struct {
         return self.trimmed_input[self.input_index..pos];
     }
 
-    pub fn readIntUntil(self: *IO, comptime T: type, value: u8) T {
-        const word = self.readUntil(value);
+    fn readWhile(self: *IO, value: u8) void {
+        if (self.eof()) return;
 
-        return parseInt(T, word, 10) catch
-            @import("std").debug.panic("Tried to read `{s}` as an integer", .{word});
+        while (!self.eof() and self.trimmed_input[self.input_index] == value)
+            self.input_index += 1;
     }
 
-    pub fn readIntUntilAny(self: *IO, comptime T: type, values: u8) T {
-        const word = self.readUntilAny(values);
+    fn readWhileAny(self: *IO, values: []const u8) void {
+        if (self.eof()) return;
 
-        return parseInt(T, word, 10) catch
-            @import("std").debug.panic("Tried to read `{s}` as an integer", .{word});
+        self.input_index =
+            indexOfNonePos(u8, self.trimmed_input, self.input_index, values) orelse
+            self.trimmed_input.len;
     }
 
     pub fn readLine(self: *IO) []const u8 {
@@ -107,21 +92,28 @@ pub const IO = struct {
 
     pub fn readWord(self: *IO) []const u8 {
         const line = self.readUntilAny("\n ");
-
-        if (!self.eof())
-            self.input_index += 1;
+        self.readWhileAny("\n ");
 
         return line;
     }
 
-    pub fn asInt(comptime T: type, word: []const u8) T {
-        return parseInt(T, word, 10) catch
-            @import("std").debug.panic("Tried to read `{s}` as an integer", .{word});
+    pub fn asInt(comptime T: type, word: []const u8) ?T {
+        return parseInt(T, word, 10) catch null;
     }
 
-    pub fn readInt(self: *IO, comptime T: type) T {
-        const word = self.readWord();
-        return asInt(T, word);
+    pub fn isDigit(value: u8) bool {
+        return value >= '0' and value <= '9';
+    }
+
+    pub fn readInt(self: *IO, comptime T: type) ?T {
+        const start = self.input_index;
+
+        while (!self.eof() and isDigit(self.trimmed_input[self.input_index]))
+            self.input_index += 1;
+
+        defer self.readWhileAny("\n ");
+
+        return asInt(T, self.trimmed_input[start..self.input_index]);
     }
 
     pub fn print(self: IO, comptime format: []const u8, args: anytype) void {

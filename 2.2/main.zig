@@ -14,10 +14,7 @@ pub fn main() !void {
     var sum: u32 = 0;
 
     while (!io.eof()) {
-        const game_word = io.readWord();
-        if (!eql(u8, game_word, "Game"))
-            @import("std").debug.panic("Unexpected word `{s}`", .{game_word});
-
+        _ = io.readWord();
         _ = io.readWord();
 
         var min_red: u16 = 0;
@@ -25,7 +22,7 @@ pub fn main() !void {
         var min_blue: u16 = 0;
 
         while (true) {
-            const count = io.readInt(u16);
+            const count = io.readInt(u16).?;
             var color = io.readWord();
             const has_comma = color[color.len - 1] == ',';
             const has_colon = color[color.len - 1] == ';';

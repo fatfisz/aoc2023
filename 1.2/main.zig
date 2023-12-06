@@ -40,7 +40,7 @@ pub fn main() !void {
                 inline for (spelled_digits, 0..) |digit, digit_index|
                     if (startsWith(u8, line[index..], digit))
                         break :blk @as(u16, @truncate(digit_index)) + 1;
-            } else @import("std").debug.panic("Did not find a digit in line `{s}`\n", .{line});
+            } else unreachable;
         };
 
         const last = blk: {
@@ -52,7 +52,7 @@ pub fn main() !void {
                 inline for (spelled_digits, 0..) |digit, digit_index|
                     if (endsWith(u8, line[0 .. index + 1], digit))
                         break :blk @as(u16, @truncate(digit_index)) + 1;
-            } else @import("std").debug.panic("Did not find a digit in line `{s}`\n", .{line});
+            } else unreachable;
         };
 
         const number = first * 10 + last;
