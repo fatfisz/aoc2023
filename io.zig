@@ -101,15 +101,22 @@ pub const IO = struct {
         return parseInt(T, word, 10) catch null;
     }
 
-    pub fn isDigit(value: u8) bool {
+    pub inline fn isDigit(value: u8) bool {
         return value >= '0' and value <= '9';
+    }
+
+    pub inline fn isDigitOrMinus(value: u8) bool {
+        return isDigit(value) or value == '-';
     }
 
     pub fn readInt(self: *IO, comptime T: type) ?T {
         const start = self.input_index;
 
-        while (!self.eof() and isDigit(self.trimmed_input[self.input_index]))
+        if (!self.eof() and isDigitOrMinus(self.trimmed_input[self.input_index])) {
             self.input_index += 1;
+            while (!self.eof() and isDigit(self.trimmed_input[self.input_index]))
+                self.input_index += 1;
+        }
 
         defer self.readWhileAny("\n ");
 
