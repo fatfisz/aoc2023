@@ -31,9 +31,8 @@ pub fn main() !void {
         var iteration: usize = 1;
 
         while (true) : (iteration += 1) {
-            var index: usize = 0;
             var all_zero = true;
-            while (index < count - iteration) : (index += 1) {
+            for (0..count - iteration) |index| {
                 diff[index] = diff[index + 1] - diff[index];
                 if (diff[index] != 0)
                     all_zero = false;

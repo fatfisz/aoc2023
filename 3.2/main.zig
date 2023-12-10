@@ -68,8 +68,7 @@ fn processLine(
     slice: []u16,
     next_slice: []u16,
 ) void {
-    var index: usize = 0;
-    while (index < line_len) : (index += 1) {
+    for (0..line_len) |index| {
         var ratio: u32 = 1;
         var count: usize = 0;
         if (gear_buffer[index]) gear: {
@@ -124,8 +123,7 @@ fn maybeSaveNumber(line: []const u8, next_slice: []u16, index: usize, first_digi
     if (first_digit_index) |fdi| {
         const number = IO.asInt(u16, line[fdi..index]).?;
 
-        var slice_index = fdi;
-        while (slice_index < index) : (slice_index += 1)
+        for (fdi..index) |slice_index|
             next_slice[slice_index] = number;
     }
 }

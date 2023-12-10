@@ -32,8 +32,7 @@ pub fn main() !void {
         const line = io.readLine();
 
         const first = blk: {
-            var index: usize = 0;
-            while (index < line.len) : (index += 1) {
+            for (0..line.len) |index| {
                 inline for (digits) |digit|
                     if (line[index] == digit)
                         break :blk line[index] - '0';
@@ -44,8 +43,8 @@ pub fn main() !void {
         };
 
         const last = blk: {
-            var index: usize = line.len - 1;
-            while (index >= 0) : (index -= 1) {
+            for (0..line.len) |reverse_index| {
+                var index = line.len - 1 - reverse_index;
                 inline for (digits) |digit|
                     if (line[index] == digit)
                         break :blk line[index] - '0';

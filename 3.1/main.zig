@@ -95,8 +95,7 @@ fn maybeSaveNumber(line: []const u8, next_slice: []u16, index: usize, first_digi
     if (first_digit_index) |fdi| {
         const number = IO.asInt(u16, line[fdi..index]).?;
 
-        var slice_index = fdi;
-        while (slice_index < index) : (slice_index += 1)
+        for (fdi..index) |slice_index|
             next_slice[slice_index] = number;
     }
 }

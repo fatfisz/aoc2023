@@ -22,10 +22,9 @@ pub fn main() !void {
     }
 
     var result: u64 = 1;
-    var index: usize = 0;
 
     _ = io.readWord();
-    while (index < length) : (index += 1) {
+    for (0..length) |index| {
         const distance = io.readInt(u16).?;
         result *= computeWays(times[index], distance);
     }
