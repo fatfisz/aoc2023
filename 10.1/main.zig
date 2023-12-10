@@ -38,20 +38,15 @@ pub fn main() !void {
     };
 
     var dist: usize = 1;
-    var prev_first = start;
-    var first = getNext(&map, width, height, start, start);
-    var prev_second = start;
-    var second = getNext(&map, width, height, start, first);
+    var prev_current = start;
+    var current = getNext(&map, width, height, start, start);
 
-    while (first.x != second.x or first.y != second.y) : (dist += 1) {
-        const next_prev_first = first;
-        first = getNext(&map, width, height, first, prev_first);
-        prev_first = next_prev_first;
-
-        const next_prev_second = second;
-        second = getNext(&map, width, height, second, prev_second);
-        prev_second = next_prev_second;
+    while (current.x != start.x or current.y != start.y) : (dist += 1) {
+        const next_prev_current = current;
+        current = getNext(&map, width, height, current, prev_current);
+        prev_current = next_prev_current;
     }
+    dist /= 2;
 
     io.print("{d}", .{dist});
 }

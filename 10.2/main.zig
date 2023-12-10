@@ -42,30 +42,24 @@ pub fn main() !void {
     };
     is_loop[start.y][start.x] = true;
 
-    var prev_first = start;
-    var first = getNext(&map, width, height, start, start);
-    var prev_second = start;
-    var second = getNext(&map, width, height, start, first);
+    var prev_current = start;
+    var current = getNext(&map, width, height, start, start);
+    var second = getNext(&map, width, height, start, current);
 
-    map[start.y][start.x] = if (first.x < start.x)
+    map[start.y][start.x] = if (current.x < start.x)
         if (second.x > start.x) '-' else if (second.y < start.y) 'J' else '7'
-    else if (first.x > start.x)
+    else if (current.x > start.x)
         if (second.y < start.y) 'L' else 'F'
     else
         '|';
 
-    while (first.x != second.x or first.y != second.y) {
-        is_loop[first.y][first.x] = true;
-        const next_prev_first = first;
-        first = getNext(&map, width, height, first, prev_first);
-        prev_first = next_prev_first;
-
-        is_loop[second.y][second.x] = true;
-        const next_prev_second = second;
-        second = getNext(&map, width, height, second, prev_second);
-        prev_second = next_prev_second;
+    while (current.x != start.x or current.y != start.y) {
+        is_loop[current.y][current.x] = true;
+        const next_prev_current = current;
+        current = getNext(&map, width, height, current, prev_current);
+        prev_current = next_prev_current;
     }
-    is_loop[first.y][first.x] = true;
+    is_loop[current.y][current.x] = true;
 
     var area: usize = 0;
 
