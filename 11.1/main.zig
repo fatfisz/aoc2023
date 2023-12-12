@@ -28,13 +28,11 @@ pub fn main() !void {
     var lengths: Number = 0;
     for (0..height) |y| {
         var galaxy_found = false;
-        for (0..width) |x| {
-            if (image[y][x] == '#') {
-                galaxy_found = true;
-                sum += lengths;
-                galaxies_so_far += 1;
-            }
-        }
+        for (0..width) |x| if (image[y][x] == '#') {
+            galaxy_found = true;
+            sum += lengths;
+            galaxies_so_far += 1;
+        };
         const mod: Number = if (galaxy_found) 1 else expansion;
         lengths += galaxies_so_far * mod;
     }
@@ -43,13 +41,11 @@ pub fn main() !void {
     lengths = 0;
     for (0..width) |x| {
         var galaxy_found = false;
-        for (0..height) |y| {
-            if (image[y][x] == '#') {
-                galaxy_found = true;
-                sum += lengths;
-                galaxies_so_far += 1;
-            }
-        }
+        for (0..height) |y| if (image[y][x] == '#') {
+            galaxy_found = true;
+            sum += lengths;
+            galaxies_so_far += 1;
+        };
         const mod: Number = if (galaxy_found) 1 else expansion;
         lengths += galaxies_so_far * mod;
     }
