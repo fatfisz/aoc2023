@@ -1,5 +1,4 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
-const tokenizeScalar = @import("std").mem.tokenizeScalar;
 
 const IO = @import("io").IO;
 
