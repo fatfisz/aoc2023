@@ -31,7 +31,7 @@ pub fn main() !void {
     while (!io.eof()) : (length += 1) {
         hands[length] = io.readWord();
         bids[length] = io.readInt(u16).?;
-        indices[length] = @as(u16, @truncate(length));
+        indices[length] = @truncate(length);
     }
 
     sort(
@@ -93,13 +93,13 @@ fn getType(hand: []const u8) u8 {
         return 1;
 
     if (countValue(u8, &count, 3) == 1)
-        return 3 - @as(u8, @truncate(countValue(u8, &count, 2)));
+        return 3 - countValue(u8, &count, 2);
 
-    return 6 - @as(u8, @truncate(countValue(u8, &count, 2)));
+    return 6 - countValue(u8, &count, 2);
 }
 
-inline fn countValue(comptime T: type, slice: []const T, value: T) usize {
-    var result: usize = 0;
+inline fn countValue(comptime T: type, slice: []const T, value: T) u8 {
+    var result: u8 = 0;
 
     for (slice) |item| {
         if (item == value)

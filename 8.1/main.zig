@@ -55,7 +55,7 @@ fn getNodeId(node_map: *StringHashMap(Number), node: []const u8) Number {
     if (node_map.get(node)) |id|
         return id;
 
-    const next_id = @as(Number, @truncate(node_map.count()));
+    const next_id: Number = @truncate(node_map.count());
     node_map.put(node, next_id) catch unreachable;
 
     return next_id;
