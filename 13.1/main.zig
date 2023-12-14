@@ -1,12 +1,14 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
+const Log2Int = @import("std").math.Log2Int;
+const Int = @import("std").meta.Int;
 
 const IO = @import("io").IO;
 
 const Number = u32;
 
-const max_size = 128;
+const Hash = Int(.unsigned, 32);
 
-const Hash = @Type(.{ .Int = .{ .signedness = .unsigned, .bits = max_size } });
+const HashShift = Log2Int(Hash);
 
 pub fn main() !void {
     var gpa = GeneralPurposeAllocator(.{}){};
@@ -36,8 +38,8 @@ pub fn main() !void {
             row_hashes_buf[height] = 0;
 
             for (line, 0..) |char, index| if (char == '#') {
-                row_hashes_buf[height] |= @as(Hash, 1) << @as(u7, @truncate(index));
-                column_hashes_buf[index] |= @as(Hash, 1) << @as(u7, @truncate(height));
+                row_hashes_buf[height] |= @as(Hash, 1) << @as(HashShift, @truncate(index));
+                column_hashes_buf[index] |= @as(Hash, 1) << @as(HashShift, @truncate(height));
             };
         }
 
