@@ -97,6 +97,16 @@ pub const IO = struct {
         return line;
     }
 
+    pub fn consumeChar(self: *IO, value: usize) bool {
+        const found =
+            self.input_index < self.trimmed_input.len and
+            value == self.trimmed_input[self.input_index];
+        defer if (found) {
+            self.input_index += 1;
+        };
+        return found;
+    }
+
     pub fn asInt(comptime T: type, word: []const u8) ?T {
         return parseInt(T, word, 10) catch null;
     }
