@@ -42,7 +42,7 @@ pub const IO = struct {
         return self.input_index == self.trimmed_input.len;
     }
 
-    fn readUntil(self: *IO, value: u8) []const u8 {
+    pub fn readUntil(self: *IO, value: u8) []const u8 {
         // Check this before calling the method
         if (self.eof()) unreachable;
 
@@ -54,7 +54,7 @@ pub const IO = struct {
         return self.trimmed_input[self.input_index..pos];
     }
 
-    fn readUntilAny(self: *IO, values: []const u8) []const u8 {
+    pub fn readUntilAny(self: *IO, values: []const u8) []const u8 {
         // Check this before calling the method
         if (self.eof()) unreachable;
 
@@ -97,6 +97,11 @@ pub const IO = struct {
         return line;
     }
 
+    pub fn readChar(self: *IO) u8 {
+        defer self.input_index += 1;
+        return self.trimmed_input[self.input_index];
+    }
+
     pub fn consumeChar(self: *IO, value: usize) bool {
         const found =
             self.input_index < self.trimmed_input.len and
@@ -104,6 +109,7 @@ pub const IO = struct {
         defer if (found) {
             self.input_index += 1;
         };
+
         return found;
     }
 
