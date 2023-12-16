@@ -1,5 +1,5 @@
-const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const ArrayList = @import("std").ArrayList;
+const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 
 const IO = @import("io").IO;
 
