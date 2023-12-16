@@ -1,23 +1,26 @@
 $cwd = Get-Location
 
-foreach ($dir in Get-ChildItem -Directory) {
-    Write-Host "Running tests in ${dir}:"
-    cd $dir
+try {
+    foreach ($dir in Get-ChildItem -Directory) {
+        Write-Host "Running tests in ${dir}:"
+        Set-Location $dir
 
-    foreach ($test in Get-ChildItem *.in) {
-        $_ = $test -match '\\([^\\]+)\.in$'
-        $test = $Matches[1]
-        Write-Host "  Test $test"
-        zig build run -- $test
+        foreach ($test in Get-ChildItem *.in) {
+            $test -match '\\([^\\]+)\.in$' > $null
+            $test = $Matches[1]
+            Write-Host "  Test $test"
+            zig build run -- $test
+
+            if (!$?) {
+                break
+            }
+        }
 
         if (!$?) {
             break
         }
     }
-
-    if (!$?) {
-        break
-    }
 }
-
-cd $cwd
+finally {
+    Set-Location $cwd
+}
