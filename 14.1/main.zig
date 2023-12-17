@@ -22,16 +22,14 @@ pub fn main() !void {
 
         const line = io.readLine();
 
-        for (line, 0..) |char, index| {
+        for (line, stop_buf[0..line.len]) |char, *stop| {
             switch (char) {
                 'O' => {
-                    load += height + 1 - stop_buf[index];
-                    stop_buf[index] += 1;
+                    load += height + 1 - stop.*;
+                    stop.* += 1;
                     rolling_stone_count += 1;
                 },
-                '#' => {
-                    stop_buf[index] = height + 1;
-                },
+                '#' => stop.* = height + 1,
                 else => {},
             }
         }

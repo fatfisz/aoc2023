@@ -13,19 +13,17 @@ pub fn main() !void {
 
     var last_line_len: usize = undefined;
     var sum: u32 = 0;
-    var gear_buffer = [_]bool{false} ** 1024;
-    var prev_buffer: [1024]u16 = undefined;
-    var buffer = [_]u16{0} ** 1024;
-    var next_buffer = [_]u16{0} ** 1024;
-    var prev_slice = prev_buffer[0..];
-    var slice = buffer[0..];
-    var next_slice = next_buffer[0..];
+    var gears_buf = [_]bool{false} ** 1024;
+    var buf = [_]u16{0} ** 3072;
+    var prev_values = buf[0..][0..1024];
+    var values = buf[1024..][0..1024];
+    var next_values = buf[2048..][0..1024];
 
     while (!io.eof()) {
-        const swap_slice = prev_slice;
-        prev_slice = slice;
-        slice = next_slice;
-        next_slice = swap_slice;
+        const swap_values = prev_values;
+        prev_values = values;
+        values = next_values;
+        next_values = swap_values;
 
         var first_digit_index: ?usize = null;
         const line = io.readLine();
@@ -36,26 +34,26 @@ pub fn main() !void {
                 if (first_digit_index == null)
                     first_digit_index = index;
             } else {
-                maybeSaveNumber(line, next_slice, index, first_digit_index);
+                maybeSaveNumber(line, next_values, index, first_digit_index);
                 first_digit_index = null;
-                next_slice[index] = 0;
+                next_values[index] = 0;
             }
         }
-        maybeSaveNumber(line, next_slice, line.len, first_digit_index);
+        maybeSaveNumber(line, next_values, line.len, first_digit_index);
 
-        processLine(line.len, &sum, &gear_buffer, prev_slice, slice, next_slice);
+        processLine(line.len, &sum, &gears_buf, prev_values, values, next_values);
 
-        for (line, 0..) |char, index|
-            gear_buffer[index] = char == '*';
+        for (line, gears_buf[0..line.len]) |char, *gear|
+            gear.* = char == '*';
     }
 
-    const swap_slice = prev_slice;
-    prev_slice = slice;
-    slice = next_slice;
-    next_slice = swap_slice;
-    @memset(next_slice, 0);
+    const swap_values = prev_values;
+    prev_values = values;
+    values = next_values;
+    next_values = swap_values;
+    @memset(next_values, 0);
 
-    processLine(last_line_len, &sum, &gear_buffer, prev_slice, slice, next_slice);
+    processLine(last_line_len, &sum, &gears_buf, prev_values, values, next_values);
 
     io.print("{d}", .{sum});
 }
@@ -63,53 +61,53 @@ pub fn main() !void {
 fn processLine(
     line_len: usize,
     sum: *u32,
-    gear_buffer: []bool,
-    prev_slice: []u16,
-    slice: []u16,
-    next_slice: []u16,
+    gears: []bool,
+    prev_values: []u16,
+    values: []u16,
+    next_values: []u16,
 ) void {
     for (0..line_len) |index| {
         var ratio: u32 = 1;
         var count: usize = 0;
-        if (gear_buffer[index]) gear: {
-            if (index > 0 and slice[index - 1] > 0) {
+        if (gears[index]) gear: {
+            if (index > 0 and values[index - 1] > 0) {
                 count += 1;
-                ratio *= slice[index - 1];
+                ratio *= values[index - 1];
             }
-            if (index < line_len - 1 and slice[index + 1] > 0) {
+            if (index < line_len - 1 and values[index + 1] > 0) {
                 count += 1;
-                ratio *= slice[index + 1];
+                ratio *= values[index + 1];
             }
-            if (prev_slice[index] > 0) {
+            if (prev_values[index] > 0) {
                 count += 1;
                 if (count > 2) break :gear;
-                ratio *= prev_slice[index];
+                ratio *= prev_values[index];
             } else {
-                if (index > 0 and prev_slice[index - 1] > 0) {
+                if (index > 0 and prev_values[index - 1] > 0) {
                     count += 1;
                     if (count > 2) break :gear;
-                    ratio *= prev_slice[index - 1];
+                    ratio *= prev_values[index - 1];
                 }
-                if (index < line_len - 1 and prev_slice[index + 1] > 0) {
+                if (index < line_len - 1 and prev_values[index + 1] > 0) {
                     count += 1;
                     if (count > 2) break :gear;
-                    ratio *= prev_slice[index + 1];
+                    ratio *= prev_values[index + 1];
                 }
             }
-            if (next_slice[index] > 0) {
+            if (next_values[index] > 0) {
                 count += 1;
                 if (count > 2) break :gear;
-                ratio *= next_slice[index];
+                ratio *= next_values[index];
             } else {
-                if (index > 0 and next_slice[index - 1] > 0) {
+                if (index > 0 and next_values[index - 1] > 0) {
                     count += 1;
                     if (count > 2) break :gear;
-                    ratio *= next_slice[index - 1];
+                    ratio *= next_values[index - 1];
                 }
-                if (index < line_len - 1 and next_slice[index + 1] > 0) {
+                if (index < line_len - 1 and next_values[index + 1] > 0) {
                     count += 1;
                     if (count > 2) break :gear;
-                    ratio *= next_slice[index + 1];
+                    ratio *= next_values[index + 1];
                 }
             }
         }
@@ -119,11 +117,11 @@ fn processLine(
     }
 }
 
-fn maybeSaveNumber(line: []const u8, next_slice: []u16, index: usize, first_digit_index: ?usize) void {
+fn maybeSaveNumber(line: []const u8, next_values: []u16, index: usize, first_digit_index: ?usize) void {
     if (first_digit_index) |fdi| {
         const number = IO.asInt(u16, line[fdi..index]).?;
 
-        for (fdi..index) |slice_index|
-            next_slice[slice_index] = number;
+        for (fdi..index) |i|
+            next_values[i] = number;
     }
 }

@@ -13,7 +13,7 @@ pub fn main() !void {
     var io = try IO.init(allocator);
     defer io.deinit();
 
-    var touched: [1024]bool = undefined;
+    var touched_buf: [1024]bool = undefined;
     var numbers_buf: [1024]Number = undefined;
     var next_numbers_buf: [1024]Number = undefined;
     var length: u16 = 0;
@@ -36,7 +36,7 @@ pub fn main() !void {
         numbers = next_numbers;
         next_numbers = swap;
         @memcpy(next_numbers, numbers);
-        @memset(touched[0..length], false);
+        @memset(touched_buf[0..length], false);
 
         while (!io.eof()) {
             const maybe_destination = io.readInt(Number);
@@ -49,10 +49,10 @@ pub fn main() !void {
             const source = io.readInt(Number).?;
             const range_length = io.readInt(Number).?;
 
-            for (numbers, 0..) |number, index|
-                if (!touched[index] and number >= source and number < source + range_length) {
-                    next_numbers[index] = destination + (number - source);
-                    touched[index] = true;
+            for (numbers, touched_buf[0..numbers.len], next_numbers) |number, *touched, *next_number|
+                if (!touched.* and number >= source and number < source + range_length) {
+                    next_number.* = destination + (number - source);
+                    touched.* = true;
                 };
         }
     }

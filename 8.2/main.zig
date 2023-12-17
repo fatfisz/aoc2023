@@ -20,8 +20,8 @@ pub fn main() !void {
 
     var node_map = StringHashMap(Number).init(allocator);
     defer node_map.deinit();
-    var start_ids = ArrayList(Number).init(allocator);
-    defer start_ids.deinit();
+    var start_ids_list = ArrayList(Number).init(allocator);
+    defer start_ids_list.deinit();
     var left: [1024]Number = undefined;
     var right: [1024]Number = undefined;
     var is_end_id = [_]bool{false} ** 1024;
@@ -30,7 +30,7 @@ pub fn main() !void {
         const node_id = getNodeId(&node_map, node);
 
         switch (node[node.len - 1]) {
-            'A' => try start_ids.append(node_id),
+            'A' => try start_ids_list.append(node_id),
             'Z' => is_end_id[node_id] = true,
             else => {},
         }
@@ -46,9 +46,9 @@ pub fn main() !void {
 
     var lcm: Number = 1;
 
-    const start_ids_slice = try start_ids.toOwnedSlice();
-    defer allocator.free(start_ids_slice);
-    for (start_ids_slice) |start_id| {
+    const start_ids = try start_ids_list.toOwnedSlice();
+    defer allocator.free(start_ids);
+    for (start_ids) |start_id| {
         var current_id = start_id;
         var directions_index: usize = 0;
         var length: Number = 0;

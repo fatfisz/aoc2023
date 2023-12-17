@@ -61,9 +61,9 @@ const SortContext = struct {
         if (lhs_type < rhs_type) return true;
         if (lhs_type > rhs_type) return false;
 
-        for (lhs_hand, 0..) |card, index| {
-            const lhs_strength = strength[card];
-            const rhs_strength = strength[rhs_hand[index]];
+        for (lhs_hand, rhs_hand) |lhs_card, rhs_card| {
+            const lhs_strength = strength[lhs_card];
+            const rhs_strength = strength[rhs_card];
             if (lhs_strength < rhs_strength) return true;
             if (lhs_strength > rhs_strength) return false;
         }
@@ -98,10 +98,10 @@ fn getType(hand: []const u8) u8 {
     return 6 - countValue(u8, &count, 2);
 }
 
-inline fn countValue(comptime T: type, slice: []const T, value: T) u8 {
+inline fn countValue(comptime T: type, items: []const T, value: T) u8 {
     var result: u8 = 0;
 
-    for (slice) |item| {
+    for (items) |item| {
         if (item == value)
             result += 1;
     }

@@ -20,7 +20,9 @@ pub fn main() !void {
     var io = try IO.init(allocator);
     defer io.deinit();
 
-    var boxes = [_][max_box_size]?Lens{[_]?Lens{null} ** max_box_size} ** 256;
+    var boxes_buf = [_][max_box_size]?Lens{
+        [_]?Lens{null} ** max_box_size,
+    } ** 256;
     var box_sizes = [_]u8{0} ** 256;
 
     while (!io.eof()) {
@@ -31,20 +33,21 @@ pub fn main() !void {
 
         if (!io.eof()) _ = io.readChar();
 
+        const box_size = box_sizes[box_index];
         if (remove) {
-            for (boxes[box_index], 0..) |lens, index|
-                if (lens != null and eql(u8, lens.?.label, label)) {
-                    boxes[box_index][index] = null;
+            for (boxes_buf[box_index][0..box_size]) |*lens|
+                if (lens.* != null and eql(u8, lens.*.?.label, label)) {
+                    lens.* = null;
                     break;
                 };
         } else {
-            for (boxes[box_index], 0..) |lens, index| {
-                if (lens != null and eql(u8, lens.?.label, label)) {
-                    boxes[box_index][index].?.focal_length = focal_length;
+            for (boxes_buf[box_index][0..box_size]) |*lens| {
+                if (lens.* != null and eql(u8, lens.*.?.label, label)) {
+                    lens.*.?.focal_length = focal_length;
                     break;
                 }
             } else {
-                boxes[box_index][box_sizes[box_index]] = .{
+                boxes_buf[box_index][box_size] = .{
                     .label = label,
                     .focal_length = focal_length,
                 };
@@ -57,7 +60,7 @@ pub fn main() !void {
 
     for (0..256) |box_index| {
         var holes: Number = 0;
-        for (boxes[box_index][0..box_sizes[box_index]], 0..) |lens, index| {
+        for (boxes_buf[box_index][0..box_sizes[box_index]], 0..) |lens, index| {
             if (lens) |l|
                 sum +=
                     (@as(Number, @truncate(box_index)) + 1) *
