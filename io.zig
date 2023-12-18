@@ -117,6 +117,10 @@ pub const IO = struct {
         return parseInt(T, word, 10) catch null;
     }
 
+    pub fn asHexInt(comptime T: type, word: []const u8) ?T {
+        return parseInt(T, word, 16) catch null;
+    }
+
     pub inline fn isDigit(value: u8) bool {
         return value >= '0' and value <= '9';
     }
