@@ -66,19 +66,25 @@ pub const IO = struct {
         return self.trimmed_input[self.input_index..pos];
     }
 
-    fn readWhile(self: *IO, value: u8) void {
-        if (self.eof()) return;
+    pub fn readWhile(self: *IO, value: u8) []const u8 {
+        if (self.eof()) return "";
 
+        const pos = self.input_index;
         while (!self.eof() and self.trimmed_input[self.input_index] == value)
             self.input_index += 1;
+
+        return self.trimmed_input[pos..self.input_index];
     }
 
-    fn readWhileAny(self: *IO, values: []const u8) void {
-        if (self.eof()) return;
+    pub fn readWhileAny(self: *IO, values: []const u8) []const u8 {
+        if (self.eof()) return "";
 
+        const pos = self.input_index;
         self.input_index =
             indexOfNonePos(u8, self.trimmed_input, self.input_index, values) orelse
             self.trimmed_input.len;
+
+        return self.trimmed_input[pos..self.input_index];
     }
 
     pub fn readLine(self: *IO) []const u8 {
@@ -92,9 +98,21 @@ pub const IO = struct {
 
     pub fn readWord(self: *IO) []const u8 {
         const line = self.readUntilAny("\n ");
-        self.readWhileAny("\n ");
-
+        _ = self.readWhileAny("\n ");
         return line;
+    }
+
+    pub fn readInt(self: *IO, comptime T: type) ?T {
+        const start = self.input_index;
+
+        if (!self.eof() and isDigitOrMinus(self.trimmed_input[self.input_index])) {
+            self.input_index += 1;
+            while (!self.eof() and isDigit(self.trimmed_input[self.input_index]))
+                self.input_index += 1;
+        }
+
+        defer _ = self.readWhileAny("\n ");
+        return asInt(T, self.trimmed_input[start..self.input_index]);
     }
 
     pub fn readChar(self: *IO) u8 {
@@ -127,20 +145,6 @@ pub const IO = struct {
 
     pub inline fn isDigitOrMinus(value: u8) bool {
         return isDigit(value) or value == '-';
-    }
-
-    pub fn readInt(self: *IO, comptime T: type) ?T {
-        const start = self.input_index;
-
-        if (!self.eof() and isDigitOrMinus(self.trimmed_input[self.input_index])) {
-            self.input_index += 1;
-            while (!self.eof() and isDigit(self.trimmed_input[self.input_index]))
-                self.input_index += 1;
-        }
-
-        defer self.readWhileAny("\n ");
-
-        return asInt(T, self.trimmed_input[start..self.input_index]);
     }
 
     pub fn print(self: IO, comptime format: []const u8, args: anytype) void {
