@@ -1,5 +1,6 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const min = @import("std").mem.min;
+const swap = @import("std").mem.swap;
 
 const IO = @import("io").IO;
 
@@ -32,11 +33,9 @@ pub fn main() !void {
     var next_numbers = next_numbers_buf[0..length];
 
     while (!io.eof()) {
-        const swap = numbers;
-        numbers = next_numbers;
-        next_numbers = swap;
+        swap([]Number, &numbers, &next_numbers);
         @memcpy(next_numbers, numbers);
-        @memset(touched_buf[0..length], false);
+        @memset(touched_buf[0..numbers.len], false);
 
         while (!io.eof()) {
             const maybe_destination = io.readInt(Number);

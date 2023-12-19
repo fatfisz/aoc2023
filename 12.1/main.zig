@@ -1,5 +1,6 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const indexOfScalar = @import("std").mem.indexOfScalar;
+const swap = @import("std").mem.swap;
 
 const IO = @import("io").IO;
 
@@ -32,9 +33,7 @@ pub fn main() !void {
         while (io.readInt(Number)) |group_length| {
             _ = io.consumeChar(',');
 
-            const swap_combinations = prev_combinations;
-            prev_combinations = combinations;
-            combinations = swap_combinations;
+            swap([]Number, &prev_combinations, &combinations);
 
             var start_index = min_index;
             var period_count = countChar(row[start_index..][0..group_length], '.');

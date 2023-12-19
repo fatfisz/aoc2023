@@ -98,7 +98,7 @@ pub fn main() !void {
         }
     }
 
-    var rolling_stones = rolling_stones_buf[0..rolling_stones_len];
+    const rolling_stones = rolling_stones_buf[0..rolling_stones_len];
     {
         const hash = getHash(rolling_stones, width);
         try first_hash_cycle.put(hash, 0);

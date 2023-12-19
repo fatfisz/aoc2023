@@ -1,5 +1,6 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const eql = @import("std").mem.eql;
+const swap = @import("std").mem.swap;
 
 const IO = @import("io").IO;
 
@@ -20,10 +21,8 @@ pub fn main() !void {
     var next_values = buf[2048..][0..1024];
 
     while (!io.eof()) {
-        const swap_values = prev_values;
-        prev_values = values;
-        values = next_values;
-        next_values = swap_values;
+        swap(*[1024]u16, &prev_values, &values);
+        swap(*[1024]u16, &values, &next_values);
 
         var first_digit_index: ?usize = null;
         const line = io.readLine();
@@ -47,10 +46,8 @@ pub fn main() !void {
             gear.* = char == '*';
     }
 
-    const swap_values = prev_values;
-    prev_values = values;
-    values = next_values;
-    next_values = swap_values;
+    swap(*[1024]u16, &prev_values, &values);
+    swap(*[1024]u16, &values, &next_values);
     @memset(next_values, 0);
 
     processLine(last_line_len, &sum, &gears_buf, prev_values, values, next_values);

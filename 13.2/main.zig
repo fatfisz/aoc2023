@@ -43,8 +43,8 @@ pub fn main() !void {
             };
         }
 
-        var row_hashes = row_hashes_buf[0..height];
-        var column_hashes = column_hashes_buf[0..width];
+        const row_hashes = row_hashes_buf[0..height];
+        const column_hashes = column_hashes_buf[0..width];
 
         if (findReflection(row_hashes)) |rows|
             sum += @as(Number, @truncate(rows)) * 100

@@ -39,20 +39,20 @@ pub fn main() !void {
     const cave = cave_buf[0..height];
     const width = cave[0].len;
 
-    var queue = ArrayList(Beam).init(allocator);
-    defer queue.deinit();
+    var stack = ArrayList(Beam).init(allocator);
+    defer stack.deinit();
 
     var touch = [_][max_size]Touch{[_]Touch{.{}} ** max_size} ** max_size;
 
-    try queue.append(.{ .x = 0, .y = 0, .direction = .right });
-    while (queue.popOrNull()) |beam| {
+    try stack.append(.{ .x = 0, .y = 0, .direction = .right });
+    while (stack.popOrNull()) |beam| {
         setTouch(&touch[beam.y][beam.x], beam.direction);
         if (getNextBeam(width, height, cave[beam.y][beam.x], beam)) |next_beam|
             if (!getTouch(touch[next_beam.y][next_beam.x], next_beam.direction))
-                try queue.append(next_beam);
+                try stack.append(next_beam);
         if (getNextBeamAlt(width, height, cave[beam.y][beam.x], beam)) |next_beam|
             if (!getTouch(touch[next_beam.y][next_beam.x], next_beam.direction))
-                try queue.append(next_beam);
+                try stack.append(next_beam);
     }
 
     var sum: Number = 0;

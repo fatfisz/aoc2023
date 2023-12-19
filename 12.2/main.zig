@@ -1,5 +1,6 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const indexOfScalar = @import("std").mem.indexOfScalar;
+const swap = @import("std").mem.swap;
 
 const IO = @import("io").IO;
 
@@ -32,11 +33,11 @@ pub fn main() !void {
         }
         for (1..5) |i|
             @memcpy(group_lengths_buf[group_lengths_count * i ..].ptr, group_lengths_buf[0..group_lengths_count]);
-        var group_lengths = group_lengths_buf[0 .. group_lengths_count * 5];
+        const group_lengths = group_lengths_buf[0 .. group_lengths_count * 5];
 
         var combinations_buf: [2048]Number = undefined;
-        var combinations = combinations_buf[0..][0..row.len];
-        var prev_combinations = combinations_buf[1024..][0..row.len];
+        var prev_combinations = combinations_buf[0..][0..row.len];
+        var combinations = combinations_buf[1024..][0..row.len];
         {
             var first_hash_index = indexOfScalar(u8, row, '#') orelse row.len;
             @memset(combinations[0..first_hash_index], 1);
@@ -45,9 +46,7 @@ pub fn main() !void {
 
         var min_index: Number = 0;
         for (group_lengths) |group_length| {
-            const swap_combinations = prev_combinations;
-            prev_combinations = combinations;
-            combinations = swap_combinations;
+            swap([]Number, &prev_combinations, &combinations);
 
             var start_index = min_index;
             var period_count = countChar(row[start_index..][0..group_length], '.');

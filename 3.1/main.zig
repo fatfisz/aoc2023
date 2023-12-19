@@ -1,5 +1,6 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
 const eql = @import("std").mem.eql;
+const swap = @import("std").mem.swap;
 
 const IO = @import("io").IO;
 
@@ -18,9 +19,7 @@ pub fn main() !void {
     var values = buf[1024..][0..1024];
 
     while (!io.eof()) {
-        const swap_values = prev_values;
-        prev_values = values;
-        values = swap_values;
+        swap(*[1024]u16, &prev_values, &values);
 
         var first_digit_index: ?usize = null;
         const line = io.readLine();
