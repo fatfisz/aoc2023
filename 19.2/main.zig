@@ -2,7 +2,6 @@ const ArrayList = @import("std").ArrayList;
 const EnumArray = @import("std").EnumArray;
 const ArenaAllocator = @import("std").heap.ArenaAllocator;
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
-const maxInt = @import("std").math.maxInt;
 const eql = @import("std").mem.eql;
 const indexOfScalar = @import("std").mem.indexOfScalar;
 const StringHashMap = @import("std").StringHashMap;
