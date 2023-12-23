@@ -1,5 +1,4 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
-const sleep = @import("std").time.sleep;
 
 const IO = @import("io").IO;
 
@@ -27,6 +26,8 @@ var edges_buf = [_][5]?Edge{
 var width: usize = 0;
 
 var height: usize = 0;
+
+var final: usize = 0;
 
 var stack_buf: [max_size * max_size]StackEdge = undefined;
 
@@ -64,6 +65,8 @@ pub fn main() !void {
 
         prev_line = line;
     }
+
+    final = getVertex(width - 2, height - 1);
 
     for (0..height) |y| {
         for (0..width) |x| {
@@ -126,7 +129,7 @@ fn pushIfNotOnStack(from: Vertex, index: Index, len: usize) void {
     if (on_stack[from])
         return;
 
-    if (isFinal(from))
+    if (from == final)
         max_path_len = @max(max_path_len, len);
 
     stack_buf[stack_len] = .{
@@ -142,8 +145,4 @@ fn pop() void {
     stack_len -= 1;
     const edge = stack_buf[stack_len];
     on_stack[edge.from] = false;
-}
-
-fn isFinal(vertex: Vertex) bool {
-    return vertex == getVertex(width - 2, height - 1);
 }

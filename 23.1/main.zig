@@ -1,5 +1,4 @@
 const GeneralPurposeAllocator = @import("std").heap.GeneralPurposeAllocator;
-const sleep = @import("std").time.sleep;
 
 const IO = @import("io").IO;
 
